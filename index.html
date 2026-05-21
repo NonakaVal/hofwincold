@@ -460,7 +460,27 @@
         </div>
 
         <!-- Config & Controls Section -->
-        <div class="flex-shrink-0 space-y-4 pb-4">
+        <div class="flex-shrink-0 space-y-3 pb-4">
+            <!-- Start / Hold Button -->
+            <button id="startBtn" class="w-full h-12 rounded-xl bg-warm-orange text-white text-sm font-semibold btn-transition hover:bg-orange-500 active:bg-vivid-orange flex items-center justify-center shadow-lg shadow-orange-500/20">
+                <i class="fas fa-play mr-2 text-xs"></i><span>Iniciar</span>
+            </button>
+            <button id="holdBtn" class="w-full h-12 rounded-xl bg-emerald-500 text-white text-sm font-semibold btn-transition hover:bg-emerald-400 active:bg-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20 hidden">
+                <i class="fas fa-check mr-2 text-xs"></i><span>Continuar</span>
+            </button>
+
+            <!-- Sound & Ambient Buttons -->
+            <div class="flex gap-3">
+                <button id="soundBtn" class="flex-1 h-11 rounded-xl bg-white/5 text-frost-blue/70 btn-transition hover:bg-white/10 active:bg-white/15 flex items-center justify-center gap-2">
+                    <i class="fas fa-volume-up text-sm" id="soundIcon"></i>
+                    <span class="text-xs">Som</span>
+                </button>
+                <button id="ambientBtn" class="flex-1 h-11 rounded-xl bg-white/5 text-frost-blue/70 btn-transition hover:bg-white/10 active:bg-white/15 flex items-center justify-center gap-2">
+                    <i class="fas fa-music text-sm" id="ambientIcon"></i>
+                    <span class="text-xs">Ambiente</span>
+                </button>
+            </div>
+
             <!-- Progress -->
             <div class="config-section">
                 <div class="flex justify-between items-center mb-2">
@@ -496,22 +516,6 @@
                     <input type="range" min="1" max="10" value="5" class="speed-slider flex-1" id="speedSlider">
                     <span class="text-[0.6rem] text-frost-blue/40 font-medium w-8">Rápido</span>
                 </div>
-            </div>
-
-            <!-- Controls -->
-            <div class="flex gap-3">
-                <button id="soundBtn" class="w-14 h-12 rounded-xl bg-white/5 text-frost-blue/70 btn-transition hover:bg-white/10 active:bg-white/15 flex items-center justify-center flex-shrink-0">
-                    <i class="fas fa-volume-up text-sm" id="soundIcon"></i>
-                </button>
-                <button id="ambientBtn" class="w-14 h-12 rounded-xl bg-white/5 text-frost-blue/70 btn-transition hover:bg-white/10 active:bg-white/15 flex items-center justify-center flex-shrink-0">
-                    <i class="fas fa-music text-sm" id="ambientIcon"></i>
-                </button>
-                <button id="startBtn" class="flex-1 h-12 rounded-xl bg-warm-orange text-white text-sm font-semibold btn-transition hover:bg-orange-500 active:bg-vivid-orange flex items-center justify-center shadow-lg shadow-orange-500/20">
-                    <i class="fas fa-play mr-2 text-xs"></i><span>Iniciar</span>
-                </button>
-                <button id="holdBtn" class="flex-1 h-12 rounded-xl bg-emerald-500 text-white text-sm font-semibold btn-transition hover:bg-emerald-400 active:bg-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20 hidden">
-                    <i class="fas fa-check mr-2 text-xs"></i><span>Continuar</span>
-                </button>
             </div>
 
             <!-- Records -->
