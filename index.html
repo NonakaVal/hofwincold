@@ -871,6 +871,21 @@
                         ], 0.28, 0.01, 3.5, now);
                         break;
 
+                    case 'countdown-tick':
+                        // Subtle rising ping — gets attention without startling
+                        _createPartial(ctx, 880, 0.10, 0.005, 0.12, now, 0).connect(ctx.destination);
+                        _createPartial(ctx, 1320, 0.04, 0.005, 0.08, now, 0).connect(ctx.destination);
+                        break;
+
+                    case 'countdown-final':
+                        // Clear bell-like alert — unmistakable "next phase starting"
+                        _playSingingBowl(ctx, ctx.destination, 523, [
+                            { ratio: 1,    gain: 0.30, decayMul: 1.0,  detune: 0 },
+                            { ratio: 1,    gain: 0.15, decayMul: 0.9,  detune: 3 },
+                            { ratio: 2.0,  gain: 0.12, decayMul: 0.5,  detune: 0 },
+                        ], 0.20, 0.008, 1.5, now);
+                        break;
+
                     case 'click':
                         // Soft tap — subtil, rapido
                         _createFilteredPartial(ctx, 1200, 0.05, 0.001, 0.035, now, 2000, 0.7).connect(ctx.destination);
@@ -1042,8 +1057,16 @@
                     recoveryTime--;
                     elements.recoveryCounter.textContent = recoveryTime;
                     
+                    // Countdown warning: subtle ticks on last 3 seconds
+                    if (recoveryTime <= 3 && recoveryTime > 0) {
+                        if (state.soundsEnabled) playSound('countdown-tick');
+                    }
+                    
                     if (recoveryTime <= 0) {
                         clearInterval(state.recoveryInterval);
+                        
+                        // Final alert before next phase
+                        if (state.soundsEnabled) playSound('countdown-final');
                         
                         if (state.currentCycle >= state.maxCycles) {
                             if (state.soundsEnabled) playSound('end');
@@ -1128,13 +1151,13 @@
                         elements.startBtn.classList.remove('hidden');
                         elements.holdBtn.classList.add('hidden');
                         elements.startBtn.innerHTML = '<i class="fas fa-play mr-2 text-xs"></i><span>Iniciar</span>';
-                        elements.startBtn.className = 'flex-1 h-12 rounded-xl bg-warm-orange text-white text-sm font-semibold btn-transition hover:bg-orange-500 active:bg-vivid-orange flex items-center justify-center shadow-lg shadow-orange-500/20';
+                        elements.startBtn.className = 'w-full h-12 rounded-xl bg-warm-orange text-white text-sm font-semibold btn-transition hover:bg-orange-500 active:bg-vivid-orange flex items-center justify-center shadow-lg shadow-orange-500/20';
                         break;
                     case 'breathing':
                         elements.startBtn.classList.remove('hidden');
                         elements.holdBtn.classList.add('hidden');
                         elements.startBtn.innerHTML = '<i class="fas fa-stop mr-2 text-xs"></i><span>Parar</span>';
-                        elements.startBtn.className = 'flex-1 h-12 rounded-xl bg-red-500/80 text-white text-sm font-semibold btn-transition hover:bg-red-500 active:bg-red-600 flex items-center justify-center shadow-lg shadow-red-500/20';
+                        elements.startBtn.className = 'w-full h-12 rounded-xl bg-red-500/80 text-white text-sm font-semibold btn-transition hover:bg-red-500 active:bg-red-600 flex items-center justify-center shadow-lg shadow-red-500/20';
                         break;
                     case 'hold':
                         elements.startBtn.classList.add('hidden');
