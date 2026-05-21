@@ -624,54 +624,115 @@
                 }
             }
 
+            // --- Sintese de sons (singing bowl / bell / chime) ---
+
+            function _createPartial(ctx, freq, gainVal, attack, decay, now, detune) {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, now);
+                if (detune) osc.detune.setValueAtTime(detune, now);
+                gain.gain.setValueAtTime(0.001, now);
+                gain.gain.linearRampToValueAtTime(gainVal, now + attack);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + attack + decay);
+                osc.connect(gain);
+                osc.start(now);
+                osc.stop(now + attack + decay + 0.05);
+                return gain;
+            }
+
+            function _createFilteredPartial(ctx, freq, gainVal, attack, decay, now, filterFreq, filterQ) {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                const filter = ctx.createBiquadFilter();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, now);
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(filterFreq, now);
+                filter.Q.setValueAtTime(filterQ || 1, now);
+                gain.gain.setValueAtTime(0.001, now);
+                gain.gain.linearRampToValueAtTime(gainVal, now + attack);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + attack + decay);
+                osc.connect(filter);
+                filter.connect(gain);
+                osc.start(now);
+                osc.stop(now + attack + decay + 0.05);
+                return gain;
+            }
+
+            function _playSingingBowl(ctx, dest, fundamental, partials, masterVol, attack, maxDecay, now) {
+                const master = ctx.createGain();
+                master.gain.setValueAtTime(masterVol, now);
+                master.connect(dest);
+                partials.forEach(function(p) {
+                    _createPartial(ctx, fundamental * p.ratio, p.gain, attack, maxDecay * p.decayMul, now, p.detune || 0).connect(master);
+                });
+            }
+
+            function _playArpeggio(ctx, dest, notes, noteDur, gap, masterVol, now) {
+                const master = ctx.createGain();
+                master.gain.setValueAtTime(masterVol, now);
+                master.connect(dest);
+                notes.forEach(function(freq, i) {
+                    _createPartial(ctx, freq, 0.6, 0.01, noteDur, now + i * gap, 0).connect(master);
+                });
+            }
+
             // Tocar som
             function playSound(type) {
                 if (!state.soundsEnabled || !state.audioContext) return;
-                
-                const now = state.audioContext.currentTime;
-                const osc = state.audioContext.createOscillator();
-                const gain = state.audioContext.createGain();
-                
+
+                const ctx = state.audioContext;
+                const now = ctx.currentTime;
+
                 switch(type) {
                     case 'start':
-                        osc.type = 'sine';
-                        osc.frequency.setValueAtTime(440, now);
-                        gain.gain.setValueAtTime(0.3, now);
+                        // Singing bowl strike — partials baseados em bowl real (~285Hz fundamental)
+                        _playSingingBowl(ctx, ctx.destination, 285, [
+                            { ratio: 1,    gain: 0.35, decayMul: 1.0,  detune: 0 },
+                            { ratio: 1,    gain: 0.20, decayMul: 0.95, detune: 3 },
+                            { ratio: 2.75, gain: 0.18, decayMul: 0.6,  detune: 0 },
+                            { ratio: 5.08, gain: 0.08, decayMul: 0.35, detune: 0 },
+                        ], 0.25, 0.008, 2.5, now);
                         break;
+
                     case 'breath':
-                        osc.type = 'triangle';
-                        osc.frequency.setValueAtTime(880, now);
-                        gain.gain.setValueAtTime(0.2, now);
+                        // Soft tick — minimo, nao-fatigante para repetir 30x
+                        _createPartial(ctx, 660, 0.12, 0.003, 0.07, now, 0);
+                        _createPartial(ctx, 990, 0.04, 0.003, 0.04, now, 0).connect(ctx.destination);
                         break;
+
                     case 'hold':
-                        osc.type = 'sine';
-                        osc.frequency.setValueAtTime(220, now);
-                        gain.gain.setValueAtTime(0.4, now);
+                        // Deep bowl tone — grave, sustentado
+                        _playSingingBowl(ctx, ctx.destination, 220, [
+                            { ratio: 1,    gain: 0.30, decayMul: 1.0,  detune: 0 },
+                            { ratio: 1,    gain: 0.15, decayMul: 0.9,  detune: -2 },
+                            { ratio: 2.53, gain: 0.12, decayMul: 0.5,  detune: 0 },
+                            { ratio: 5.1,  gain: 0.05, decayMul: 0.25, detune: 0 },
+                        ], 0.22, 0.03, 3.0, now);
                         break;
+
                     case 'recovery':
-                        osc.type = 'sine';
-                        osc.frequency.setValueAtTime(660, now);
-                        gain.gain.setValueAtTime(0.3, now);
+                        // Rising chime — arpejo ascendente C5→E5→G5
+                        _playArpeggio(ctx, ctx.destination, [523.25, 659.25, 783.99], 0.35, 0.12, 0.2, now);
                         break;
+
                     case 'end':
-                        osc.type = 'sine';
-                        osc.frequency.setValueAtTime(880, now);
-                        osc.frequency.exponentialRampToValueAtTime(440, now + 0.5);
-                        gain.gain.setValueAtTime(0.3, now);
+                        // Gong resonance — rico, decay longo, 5 partials
+                        _playSingingBowl(ctx, ctx.destination, 220, [
+                            { ratio: 1,    gain: 0.28, decayMul: 1.0,  detune: 0 },
+                            { ratio: 1,    gain: 0.14, decayMul: 0.95, detune: 4 },
+                            { ratio: 2.53, gain: 0.14, decayMul: 0.55, detune: 0 },
+                            { ratio: 4.02, gain: 0.07, decayMul: 0.3,  detune: 0 },
+                            { ratio: 6.27, gain: 0.04, decayMul: 0.18, detune: 0 },
+                        ], 0.28, 0.01, 3.5, now);
                         break;
+
                     case 'click':
-                        osc.type = 'square';
-                        osc.frequency.setValueAtTime(220, now);
-                        gain.gain.setValueAtTime(0.1, now);
+                        // Soft tap — subtil, rapido
+                        _createFilteredPartial(ctx, 1200, 0.05, 0.001, 0.035, now, 2000, 0.7).connect(ctx.destination);
                         break;
                 }
-                
-                osc.connect(gain);
-                gain.connect(state.audioContext.destination);
-                
-                osc.start(now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-                osc.stop(now + 0.6);
             }
 
             // Alternar som
