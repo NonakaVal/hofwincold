@@ -319,6 +319,95 @@
             to { opacity: 1; transform: translateX(0); }
         }
         .slide-in { animation: slideIn 0.3s ease forwards; }
+
+        /* Ambient sound overlay */
+        .ambient-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 40;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .ambient-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .ambient-panel {
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+        .ambient-overlay.active .ambient-panel {
+            transform: translateY(0);
+        }
+        .ambient-sound-item {
+            padding: 10px 4px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            border: 1px solid transparent;
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .ambient-sound-item:hover {
+            background-color: rgba(186, 230, 253, 0.06);
+        }
+        .ambient-sound-item.active {
+            background-color: rgba(3, 105, 161, 0.2);
+            border-color: rgba(56, 189, 248, 0.25);
+            box-shadow: 0 0 12px rgba(3, 105, 161, 0.2);
+        }
+        .ambient-sound-item.active .amb-icon {
+            color: var(--color-frost-blue);
+        }
+        .ambient-sound-item.active .amb-label {
+            color: var(--color-ice-blue);
+        }
+        .amb-icon {
+            font-size: 1.1rem;
+            color: rgba(186, 230, 253, 0.4);
+            transition: color 0.2s;
+        }
+        .amb-label {
+            font-size: 0.55rem;
+            font-weight: 500;
+            color: rgba(186, 230, 253, 0.35);
+            transition: color 0.2s;
+            line-height: 1.2;
+        }
+        .ambient-volume-slider {
+            -webkit-appearance: none;
+            height: 4px;
+            background: linear-gradient(to right, var(--color-cold-blue), var(--color-recovery-teal));
+            border-radius: 2px;
+            outline: none;
+        }
+        .ambient-volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--color-ice-blue);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+        .ambient-volume-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+            box-shadow: 0 0 10px rgba(186, 230, 253, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -414,6 +503,9 @@
                 <button id="soundBtn" class="w-14 h-12 rounded-xl bg-white/5 text-frost-blue/70 btn-transition hover:bg-white/10 active:bg-white/15 flex items-center justify-center flex-shrink-0">
                     <i class="fas fa-volume-up text-sm" id="soundIcon"></i>
                 </button>
+                <button id="ambientBtn" class="w-14 h-12 rounded-xl bg-white/5 text-frost-blue/70 btn-transition hover:bg-white/10 active:bg-white/15 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-music text-sm" id="ambientIcon"></i>
+                </button>
                 <button id="startBtn" class="flex-1 h-12 rounded-xl bg-warm-orange text-white text-sm font-semibold btn-transition hover:bg-orange-500 active:bg-vivid-orange flex items-center justify-center shadow-lg shadow-orange-500/20">
                     <i class="fas fa-play mr-2 text-xs"></i><span>Iniciar</span>
                 </button>
@@ -435,6 +527,43 @@
                     <div id="recordsList" class="max-h-36 overflow-y-auto pr-1 space-y-1.5">
                         <div class="text-[0.65rem] text-frost-blue/30 text-center py-4">Nenhum registro ainda</div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ambient Sound Overlay -->
+    <div id="ambientOverlay" class="ambient-overlay">
+        <div class="ambient-panel w-full max-w-[480px] frost-glass rounded-t-2xl p-5 pb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-semibold text-gradient">Som Ambiente</h3>
+                <button id="ambientCloseBtn" class="w-8 h-8 rounded-full bg-white/5 text-frost-blue/50 flex items-center justify-center btn-transition hover:bg-white/10 hover:text-frost-blue/80">
+                    <i class="fas fa-xmark text-sm"></i>
+                </button>
+            </div>
+            <div class="grid grid-cols-3 gap-3 mb-5">
+                <div class="ambient-sound-item" data-sound="none">
+                    <i class="fas fa-ban amb-icon"></i>
+                    <span class="amb-label">Nenhum</span>
+                </div>
+                <div class="ambient-sound-item" data-sound="waves">
+                    <i class="fas fa-water amb-icon"></i>
+                    <span class="amb-label">Ondas</span>
+                </div>
+                <div class="ambient-sound-item" data-sound="rain">
+                    <i class="fas fa-cloud-rain amb-icon"></i>
+                    <span class="amb-label">Chuva</span>
+                </div>
+            </div>
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-[0.65rem] text-frost-blue/60 uppercase tracking-wider font-medium">Volume</span>
+                    <span class="text-[0.65rem] font-semibold text-frost-blue/80"><span id="ambientVolValue">50</span>%</span>
+                </div>
+                <div class="flex items-center gap-2.5">
+                    <i class="fas fa-volume-low text-[0.55rem] text-frost-blue/30"></i>
+                    <input type="range" min="0" max="100" value="50" class="ambient-volume-slider flex-1" id="ambientVolumeSlider">
+                    <i class="fas fa-volume-high text-[0.55rem] text-frost-blue/30"></i>
                 </div>
             </div>
         </div>
@@ -525,7 +654,14 @@
                 newSessionBtn: document.getElementById('newSessionBtn'),
                 soundIcon: document.getElementById('soundIcon'),
                 recordsToggle: document.getElementById('recordsToggle'),
-                recordsContent: document.getElementById('recordsContent')
+                recordsContent: document.getElementById('recordsContent'),
+                ambientBtn: document.getElementById('ambientBtn'),
+                ambientIcon: document.getElementById('ambientIcon'),
+                ambientOverlay: document.getElementById('ambientOverlay'),
+                ambientCloseBtn: document.getElementById('ambientCloseBtn'),
+                ambientVolumeSlider: document.getElementById('ambientVolumeSlider'),
+                ambientVolValue: document.getElementById('ambientVolValue'),
+                ambientSoundItems: document.querySelectorAll('.ambient-sound-item')
             };
 
             // Estados do aplicativo
@@ -546,7 +682,10 @@
                 audioContext: null,
                 backgroundNoise: null,
                 lastBreathSound: 3,
-                sessionStartTime: null
+                sessionStartTime: null,
+                ambientSound: null,
+                ambientInstance: null,
+                ambientVolume: 0.5
             };
 
             // Phase badge update
@@ -1260,6 +1399,93 @@
                 elements.breathProgress.style.width = `${percent}%`;
             }
 
+            // === AMBIENT SOUND ENGINE ===
+
+            var ambientSounds = {
+                waves: 'Assets/_audios_mp3/Relax ⧸ som ambiente praia e ondas do mar [S0GO4cVAkiY].mp3',
+                rain: 'Assets/_audios_mp3/Som de Chuva 🌧️ - Para Relaxar e Dormir [Ma5GpR1T2t4].mp3'
+            };
+
+            function startAmbientSound(soundId) {
+                if (state.ambientInstance) {
+                    state.ambientInstance.pause();
+                    state.ambientInstance.currentTime = 0;
+                    state.ambientInstance = null;
+                }
+                if (soundId === 'none' || !soundId) {
+                    state.ambientSound = null;
+                    updateAmbientBtn();
+                    return;
+                }
+                state.ambientSound = soundId;
+                var audio = new Audio(ambientSounds[soundId]);
+                audio.loop = true;
+                audio.volume = state.ambientVolume;
+                audio.play().catch(function() {});
+                state.ambientInstance = audio;
+                updateAmbientBtn();
+            }
+
+            function stopAmbientSound() {
+                if (state.ambientInstance) {
+                    state.ambientInstance.pause();
+                    state.ambientInstance.currentTime = 0;
+                    state.ambientInstance = null;
+                }
+                state.ambientSound = null;
+                updateAmbientBtn();
+            }
+
+            function updateAmbientBtn() {
+                if (state.ambientSound) {
+                    elements.ambientBtn.classList.add('bg-white/10');
+                    elements.ambientBtn.classList.remove('bg-white/5');
+                    elements.ambientIcon.style.color = 'var(--color-frost-blue)';
+                } else {
+                    elements.ambientBtn.classList.remove('bg-white/10');
+                    elements.ambientBtn.classList.add('bg-white/5');
+                    elements.ambientIcon.style.color = '';
+                }
+            }
+
+            function toggleAmbientOverlay() {
+                var overlay = elements.ambientOverlay;
+                if (overlay.classList.contains('active')) {
+                    overlay.classList.remove('active');
+                } else {
+                    overlay.classList.add('active');
+                    updateAmbientSelection();
+                }
+            }
+
+            function updateAmbientSelection() {
+                elements.ambientSoundItems.forEach(function(item) {
+                    if (item.dataset.sound === state.ambientSound) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
+                });
+            }
+
+            function selectAmbientSound(soundId) {
+                if (soundId === state.ambientSound) {
+                    startAmbientSound(null);
+                } else {
+                    startAmbientSound(soundId);
+                }
+                updateAmbientSelection();
+            }
+
+            function updateAmbientVolume() {
+                var val = parseInt(elements.ambientVolumeSlider.value);
+                state.ambientVolume = val / 100;
+                elements.ambientVolValue.textContent = val;
+                if (state.ambientInstance) {
+                    state.ambientInstance.volume = state.ambientVolume;
+                }
+            }
+
             // Event Listeners
             elements.startBtn.addEventListener('click', startSession);
             elements.holdBtn.addEventListener('click', function() {
@@ -1270,6 +1496,18 @@
             elements.soundBtn.addEventListener('click', toggleSound);
             elements.speedSlider.addEventListener('input', updateSpeed);
             elements.clearAllBtn.addEventListener('click', clearAllRecords);
+
+            elements.ambientBtn.addEventListener('click', toggleAmbientOverlay);
+            elements.ambientCloseBtn.addEventListener('click', toggleAmbientOverlay);
+            elements.ambientOverlay.addEventListener('click', function(e) {
+                if (e.target === elements.ambientOverlay) toggleAmbientOverlay();
+            });
+            elements.ambientSoundItems.forEach(function(item) {
+                item.addEventListener('click', function() {
+                    selectAmbientSound(this.dataset.sound);
+                });
+            });
+            elements.ambientVolumeSlider.addEventListener('input', updateAmbientVolume);
 
             elements.breathOptions.forEach(option => {
                 option.addEventListener('click', function() {
