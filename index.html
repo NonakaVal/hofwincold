@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#020617">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Hofwin — Respiração Wim Hof</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-deep-space: #020617;
+            --color-deep-blue: #0f172a;
+            --color-mid-blue: #1e293b;
+            --color-ice-blue: #e0f2fe;
+            --color-frost-blue: #bae6fd;
+            --color-cold-blue: #0369a1;
+            --color-warm-orange: #f97316;
+            --color-vivid-orange: #ea580c;
+            --color-recovery-teal: #2dd4bf;
+            --color-recovery-dark: #0d9488;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(180deg, var(--color-deep-space) 0%, var(--color-deep-blue) 50%, #0c1524 100%);
+            color: var(--color-ice-blue);
+            min-height: 100vh;
+            min-height: 100dvh;
+            min-height: -webkit-fill-available;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            min-height: 100vh;
+            min-height: 100dvh;
+            min-height: -webkit-fill-available;
+            display: flex;
+            flex-direction: column;
+            padding: env(safe-area-inset-top) 20px env(safe-area-inset-bottom) 20px;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .frost-glass {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(186, 230, 253, 0.06);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .breathing-circle {
+            transition: all 1s cubic-bezier(0.25, 0.1, 0.25, 1);
+            background: radial-gradient(circle at 40% 40%, #0ea5e9, var(--color-cold-blue) 40%, #075985 70%, #0c4a6e);
+            box-shadow:
+                0 0 30px rgba(14, 165, 233, 0.08),
+                0 0 60px rgba(14, 165, 233, 0.04),
+                inset 0 0 40px rgba(14, 165, 233, 0.05);
+        }
+
+        .breathing-in {
+            animation: breatheIn 3.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+        }
+
+        .breathing-out {
+            animation: breatheOut 3.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+        }
+
+        @keyframes breatheIn {
+            0% { transform: scale(1); opacity: 0.15; box-shadow: 0 0 20px rgba(14, 165, 233, 0.06), inset 0 0 30px rgba(14, 165, 233, 0.03); }
+            100% { transform: scale(1.08); opacity: 0.3; box-shadow: 0 0 40px rgba(14, 165, 233, 0.12), 0 0 80px rgba(14, 165, 233, 0.04), inset 0 0 50px rgba(14, 165, 233, 0.06); }
+        }
+
+        @keyframes breatheOut {
+            0% { transform: scale(1.08); opacity: 0.3; box-shadow: 0 0 40px rgba(14, 165, 233, 0.12), 0 0 80px rgba(14, 165, 233, 0.04), inset 0 0 50px rgba(14, 165, 233, 0.06); }
+            100% { transform: scale(1); opacity: 0.15; box-shadow: 0 0 20px rgba(14, 165, 233, 0.06), inset 0 0 30px rgba(14, 165, 233, 0.03); }
+        }
+
+        .circle-outer-ring {
+            position: absolute;
+            inset: -8px;
+            border-radius: 50%;
+            border: 1px solid rgba(186, 230, 253, 0.04);
+            pointer-events: none;
+        }
+
+        .speed-slider {
+            -webkit-appearance: none;
+            height: 4px;
+            background: linear-gradient(to right, var(--color-cold-blue), var(--color-warm-orange));
+            border-radius: 2px;
+            outline: none;
+        }
+
+        .speed-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--color-ice-blue);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .speed-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+            box-shadow: 0 0 12px rgba(186, 230, 253, 0.3);
+        }
+
+        .breath-progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-cold-blue), #38bdf8);
+            transition: width 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+            border-radius: 9999px;
+        }
+
+        .record-item {
+            border-left: 3px solid var(--color-cold-blue);
+            transition: all 0.3s ease;
+            background: rgba(186, 230, 253, 0.02);
+        }
+
+        .record-item:hover {
+            background: rgba(186, 230, 253, 0.06);
+            transform: translateX(2px);
+        }
+
+        .phase-glow {
+            animation: phaseGlow 2s infinite alternate;
+        }
+
+        @keyframes phaseGlow {
+            from {
+                box-shadow: 0 0 12px rgba(249, 115, 22, 0.2);
+                border-color: rgba(249, 115, 22, 0.4);
+            }
+            to {
+                box-shadow: 0 0 36px rgba(249, 115, 22, 0.35);
+                border-color: rgba(249, 115, 22, 0.7);
+            }
+        }
+
+        .recovery-glow {
+            animation: recoveryGlow 2s infinite alternate;
+        }
+
+        @keyframes recoveryGlow {
+            from {
+                box-shadow: 0 0 12px rgba(45, 212, 191, 0.2);
+                border-color: rgba(45, 212, 191, 0.4);
+            }
+            to {
+                box-shadow: 0 0 36px rgba(45, 212, 191, 0.35);
+                border-color: rgba(45, 212, 191, 0.7);
+            }
+        }
+
+        .btn-transition {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, var(--color-ice-blue), var(--color-frost-blue));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Phase badge */
+        .phase-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            transition: all 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+            opacity: 0;
+            transform: translateY(-6px);
+        }
+        .phase-badge.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .phase-badge.breathing-badge {
+            background: rgba(3, 105, 161, 0.25);
+            color: var(--color-frost-blue);
+            border: 1px solid rgba(186, 230, 253, 0.15);
+        }
+        .phase-badge.hold-badge {
+            background: rgba(249, 115, 22, 0.2);
+            color: var(--color-warm-orange);
+            border: 1px solid rgba(249, 115, 22, 0.25);
+        }
+        .phase-badge.recovery-badge {
+            background: rgba(45, 212, 191, 0.15);
+            color: var(--color-recovery-teal);
+            border: 1px solid rgba(45, 212, 191, 0.2);
+        }
+
+        /* Session active: hide config sections */
+        .session-active .config-section {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            transition: max-height 0.5s ease, opacity 0.3s ease, margin 0.3s ease;
+        }
+
+        .config-section {
+            max-height: 200px;
+            opacity: 1;
+            transition: max-height 0.5s ease, opacity 0.3s ease, margin 0.3s ease;
+        }
+
+        /* Cross-fade for phase content */
+        .phase-content {
+            transition: opacity 0.8s cubic-bezier(0.25, 0.1, 0.25, 1), transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
+        /* Breath option */
+        .breath-option {
+            padding: 10px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid transparent;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .breath-option:hover {
+            background-color: rgba(186, 230, 253, 0.08);
+            border-color: rgba(186, 230, 253, 0.1);
+        }
+
+        .breath-option.selected {
+            background-color: var(--color-cold-blue);
+            color: white;
+            border-color: rgba(56, 189, 248, 0.3);
+            box-shadow: 0 0 12px rgba(3, 105, 161, 0.3);
+        }
+
+        /* Session summary overlay */
+        .session-summary {
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.92);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        .session-summary.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Records toggle */
+        .records-toggle {
+            cursor: pointer;
+            user-select: none;
+        }
+        .records-toggle .toggle-icon {
+            transition: transform 0.3s ease;
+        }
+        .records-collapsed .records-content {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.4s ease, opacity 0.3s ease;
+        }
+        .records-content {
+            max-height: 200px;
+            opacity: 1;
+            transition: max-height 0.4s ease, opacity 0.3s ease;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(224, 242, 254, 0.03); border-radius: 2px; }
+        ::-webkit-scrollbar-thumb { background: rgba(3, 105, 161, 0.4); border-radius: 2px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--color-cold-blue); }
+
+        .vibration { animation: vibrate 0.3s linear infinite; }
+        @keyframes vibrate {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-8px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .slide-in { animation: slideIn 0.3s ease forwards; }
+    </style>
+</head>
+<body>
+    <div id="appContainer" class="app-container">
+        <!-- Header -->
+        <div class="flex items-center justify-between py-3 flex-shrink-0">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-sky-600 to-blue-900 flex items-center justify-center">
+                    <i class="fas fa-wind text-xs text-sky-200"></i>
+                </div>
+                <span class="text-sm font-semibold text-gradient">Hofwin</span>
+            </div>
+            <div id="phaseBadge" class="phase-badge">
+                <i id="phaseBadgeIcon" class="fas fa-wind text-xs"></i>
+                <span id="phaseBadgeText">Pronto</span>
+            </div>
+        </div>
+
+        <!-- Breathing Circle — grows to fill space -->
+        <div class="flex-grow flex items-center justify-center py-4">
+            <div class="relative w-56 h-56 sm:w-64 sm:h-64">
+                <div class="circle-outer-ring"></div>
+                <!-- Breathing Counter -->
+                <div id="breathingCounter" class="phase-content absolute inset-0 flex items-center justify-center transition-all duration-700 ease-in-out">
+                    <div class="text-center">
+                        <div class="text-6xl font-extralight mb-1 tracking-tight" id="counter">30</div>
+                        <div class="text-xs text-frost-blue opacity-70 font-medium" id="phaseText">Pronto para começar</div>
+                    </div>
+                </div>
+
+                <!-- Hold Counter -->
+                <div id="holdCounterContainer" class="phase-content absolute inset-0 rounded-full border-2 border-orange-500/50 flex items-center justify-center opacity-0 phase-glow transition-all duration-700 ease-in-out">
+                    <div class="text-center px-4">
+                        <div class="text-5xl font-extralight mb-1 text-orange-400 tracking-tight" id="holdCounter">Segure</div>
+                        <div class="text-xs text-orange-400/70 font-medium">Pressione Continuar</div>
+                    </div>
+                </div>
+
+                <!-- Recovery Counter -->
+                <div id="recoveryCounterContainer" class="phase-content absolute inset-0 rounded-full border-2 border-teal-400/50 flex items-center justify-center opacity-0 recovery-glow transition-all duration-700 ease-in-out">
+                    <div class="text-center">
+                        <div class="text-6xl font-extralight mb-1 text-teal-400 tracking-tight" id="recoveryCounter">15</div>
+                        <div class="text-xs text-teal-400/70 font-medium">Recuperação</div>
+                    </div>
+                </div>
+
+                <!-- Breathing Circle Background -->
+                <div id="breathingCircle" class="absolute inset-0 rounded-full border border-sky-500/10 opacity-20 transition-all duration-1000 ease-in-out"></div>
+            </div>
+        </div>
+
+        <!-- Config & Controls Section -->
+        <div class="flex-shrink-0 space-y-4 pb-4">
+            <!-- Progress -->
+            <div class="config-section">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-[0.65rem] text-frost-blue/60 uppercase tracking-wider font-medium">Progresso</span>
+                    <span class="text-[0.65rem] font-semibold text-frost-blue/80">Ciclo <span id="cycleCount">0</span>/<span id="totalCycles">3</span></span>
+                </div>
+                <div class="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                    <div id="breathProgress" class="breath-progress h-full" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Breath Count Selection -->
+            <div class="config-section">
+                <span class="text-[0.65rem] text-frost-blue/60 uppercase tracking-wider font-medium block mb-2">Respirações</span>
+                <div class="grid grid-cols-6 gap-1.5">
+                    <div class="breath-option" data-breaths="15">15</div>
+                    <div class="breath-option" data-breaths="20">20</div>
+                    <div class="breath-option" data-breaths="25">25</div>
+                    <div class="breath-option selected" data-breaths="30">30</div>
+                    <div class="breath-option" data-breaths="35">35</div>
+                    <div class="breath-option" data-breaths="40">40</div>
+                </div>
+            </div>
+
+            <!-- Speed Control -->
+            <div class="config-section">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-[0.65rem] text-frost-blue/60 uppercase tracking-wider font-medium">Velocidade</span>
+                    <span class="text-[0.65rem] font-semibold text-frost-blue/80"><span id="speedValue">5</span>/10</span>
+                </div>
+                <div class="flex items-center gap-2.5">
+                    <span class="text-[0.6rem] text-frost-blue/40 font-medium w-8 text-right">Lento</span>
+                    <input type="range" min="1" max="10" value="5" class="speed-slider flex-1" id="speedSlider">
+                    <span class="text-[0.6rem] text-frost-blue/40 font-medium w-8">Rápido</span>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="flex gap-3">
+                <button id="soundBtn" class="w-14 h-12 rounded-xl bg-white/5 text-frost-blue/70 btn-transition hover:bg-white/10 active:bg-white/15 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-volume-up text-sm" id="soundIcon"></i>
+                </button>
+                <button id="startBtn" class="flex-1 h-12 rounded-xl bg-warm-orange text-white text-sm font-semibold btn-transition hover:bg-orange-500 active:bg-vivid-orange flex items-center justify-center shadow-lg shadow-orange-500/20">
+                    <i class="fas fa-play mr-2 text-xs"></i><span>Iniciar</span>
+                </button>
+                <button id="holdBtn" class="flex-1 h-12 rounded-xl bg-emerald-500 text-white text-sm font-semibold btn-transition hover:bg-emerald-400 active:bg-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20 hidden">
+                    <i class="fas fa-check mr-2 text-xs"></i><span>Continuar</span>
+                </button>
+            </div>
+
+            <!-- Records -->
+            <div id="recordsContainer" class="config-section">
+                <div class="records-toggle flex items-center justify-between mb-2" id="recordsToggle">
+                    <h3 class="text-[0.65rem] text-frost-blue/60 uppercase tracking-wider font-medium">Retenções</h3>
+                    <div class="flex items-center gap-2">
+                        <button id="clearAllBtn" class="text-[0.6rem] text-frost-blue/40 hover:text-frost-blue/80 transition-colors">Limpar</button>
+                        <i class="fas fa-chevron-down text-[0.5rem] text-frost-blue/40 toggle-icon"></i>
+                    </div>
+                </div>
+                <div id="recordsContent" class="records-content">
+                    <div id="recordsList" class="max-h-36 overflow-y-auto pr-1 space-y-1.5">
+                        <div class="text-[0.65rem] text-frost-blue/30 text-center py-4">Nenhum registro ainda</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Session Summary Overlay -->
+    <div id="sessionSummary" class="session-summary">
+        <div class="w-full max-w-sm mx-4 frost-glass rounded-2xl p-6 sm:p-8">
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 rounded-full bg-emerald-500/15 flex items-center justify-center mx-auto mb-3">
+                    <i class="fas fa-check text-emerald-400 text-lg"></i>
+                </div>
+                <h2 class="text-xl font-bold text-gradient mb-1">Sessão Completa</h2>
+                <p class="text-xs text-frost-blue/50 font-medium" id="summaryDate"></p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-5">
+                <div class="bg-white/[0.03] rounded-xl p-3 text-center">
+                    <div class="text-[0.6rem] text-frost-blue/40 uppercase tracking-wider mb-1">Tempo Total</div>
+                    <div class="text-lg font-semibold text-ice-blue" id="summaryTotalTime">00:00</div>
+                </div>
+                <div class="bg-white/[0.03] rounded-xl p-3 text-center">
+                    <div class="text-[0.6rem] text-frost-blue/40 uppercase tracking-wider mb-1">Melhor Retenção</div>
+                    <div class="text-lg font-semibold text-orange-400" id="summaryBestHold">0s</div>
+                </div>
+            </div>
+
+            <div class="space-y-2 mb-6" id="summaryCycles"></div>
+
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <div class="bg-white/[0.03] rounded-xl p-3 text-center">
+                    <div class="text-[0.6rem] text-frost-blue/40 uppercase tracking-wider mb-1">Média</div>
+                    <div class="text-lg font-semibold text-teal-400" id="summaryAvgHold">0s</div>
+                </div>
+                <div class="bg-white/[0.03] rounded-xl p-3 text-center">
+                    <div class="text-[0.6rem] text-frost-blue/40 uppercase tracking-wider mb-1">Ciclos</div>
+                    <div class="text-lg font-semibold text-ice-blue" id="summaryCyclesCount">3</div>
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button id="saveImageBtn" class="flex-1 h-12 rounded-xl bg-white/5 text-frost-blue/80 text-sm font-medium btn-transition hover:bg-white/10 flex items-center justify-center">
+                    <i class="fas fa-download mr-2 text-xs"></i><span>Salvar</span>
+                </button>
+                <button id="newSessionBtn" class="flex-1 h-12 rounded-xl bg-warm-orange text-white text-sm font-semibold btn-transition hover:bg-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
+                    <span>Nova Sessão</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elementos DOM
+            const elements = {
+                startBtn: document.getElementById('startBtn'),
+                holdBtn: document.getElementById('holdBtn'),
+                soundBtn: document.getElementById('soundBtn'),
+                clearAllBtn: document.getElementById('clearAllBtn'),
+                counter: document.getElementById('counter'),
+                holdCounter: document.getElementById('holdCounter'),
+                recoveryCounter: document.getElementById('recoveryCounter'),
+                phaseText: document.getElementById('phaseText'),
+                cycleCount: document.getElementById('cycleCount'),
+                totalCycles: document.getElementById('totalCycles'),
+                breathingCircle: document.getElementById('breathingCircle'),
+                breathingCounter: document.getElementById('breathingCounter'),
+                holdCounterContainer: document.getElementById('holdCounterContainer'),
+                recoveryCounterContainer: document.getElementById('recoveryCounterContainer'),
+                breathProgress: document.getElementById('breathProgress'),
+                speedSlider: document.getElementById('speedSlider'),
+                speedValue: document.getElementById('speedValue'),
+                recordsContainer: document.getElementById('recordsContainer'),
+                recordsList: document.getElementById('recordsList'),
+                breathOptions: document.querySelectorAll('.breath-option'),
+                appContainer: document.getElementById('appContainer'),
+                phaseBadge: document.getElementById('phaseBadge'),
+                phaseBadgeIcon: document.getElementById('phaseBadgeIcon'),
+                phaseBadgeText: document.getElementById('phaseBadgeText'),
+                sessionSummary: document.getElementById('sessionSummary'),
+                summaryTotalTime: document.getElementById('summaryTotalTime'),
+                summaryBestHold: document.getElementById('summaryBestHold'),
+                summaryAvgHold: document.getElementById('summaryAvgHold'),
+                summaryCycles: document.getElementById('summaryCycles'),
+                summaryCyclesCount: document.getElementById('summaryCyclesCount'),
+                summaryDate: document.getElementById('summaryDate'),
+                saveImageBtn: document.getElementById('saveImageBtn'),
+                newSessionBtn: document.getElementById('newSessionBtn'),
+                soundIcon: document.getElementById('soundIcon'),
+                recordsToggle: document.getElementById('recordsToggle'),
+                recordsContent: document.getElementById('recordsContent')
+            };
+
+            // Estados do aplicativo
+            const state = {
+                isRunning: false,
+                currentCycle: 0,
+                maxCycles: 3,
+                currentPhase: 'idle',
+                breathCount: 30,
+                breathDuration: 4000,
+                holdStartTime: null,
+                holdDuration: 0,
+                breathInterval: null,
+                recoveryInterval: null,
+                holdRecords: [],
+                sessionRecords: [],
+                soundsEnabled: true,
+                audioContext: null,
+                backgroundNoise: null,
+                lastBreathSound: 3,
+                sessionStartTime: null
+            };
+
+            // Phase badge update
+            function updatePhaseBadge(phase) {
+                const badge = elements.phaseBadge;
+                badge.classList.remove('visible', 'breathing-badge', 'hold-badge', 'recovery-badge');
+                
+                requestAnimationFrame(() => {
+                    switch(phase) {
+                        case 'breathing':
+                            badge.className = 'phase-badge breathing-badge visible';
+                            elements.phaseBadgeIcon.className = 'fas fa-wind text-xs';
+                            elements.phaseBadgeText.textContent = 'Respiração';
+                            break;
+                        case 'hold':
+                            badge.className = 'phase-badge hold-badge visible';
+                            elements.phaseBadgeIcon.className = 'fas fa-pause text-xs';
+                            elements.phaseBadgeText.textContent = 'Retenção';
+                            break;
+                        case 'recovery':
+                            badge.className = 'phase-badge recovery-badge visible';
+                            elements.phaseBadgeIcon.className = 'fas fa-rotate text-xs';
+                            elements.phaseBadgeText.textContent = 'Recuperação';
+                            break;
+                        default:
+                            badge.className = 'phase-badge';
+                            elements.phaseBadgeIcon.className = 'fas fa-wind text-xs';
+                            elements.phaseBadgeText.textContent = 'Pronto';
+                    }
+                });
+            }
+
+            // Session active toggle
+            function setSessionActive(active) {
+                if (active) {
+                    elements.appContainer.classList.add('session-active');
+                } else {
+                    elements.appContainer.classList.remove('session-active');
+                }
+            }
+
+            // Inicializar áudio
+            function initAudioContext() {
+                try {
+                    state.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    
+                    const bufferSize = 2 * state.audioContext.sampleRate;
+                    const noiseBuffer = state.audioContext.createBuffer(1, bufferSize, state.audioContext.sampleRate);
+                    const output = noiseBuffer.getChannelData(0);
+                    
+                    for (let i = 0; i < bufferSize; i++) {
+                        output[i] = Math.random() * 2 - 1;
+                    }
+                    
+                    state.backgroundNoise = state.audioContext.createBufferSource();
+                    state.backgroundNoise.buffer = noiseBuffer;
+                    state.backgroundNoise.loop = true;
+                    
+                    const filter = state.audioContext.createBiquadFilter();
+                    filter.type = "highpass";
+                    filter.frequency.value = 500;
+                    
+                    const gain = state.audioContext.createGain();
+                    gain.gain.value = 0.01;
+                    
+                    state.backgroundNoise.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(state.audioContext.destination);
+                    
+                } catch (e) {
+                    console.error('Web Audio API não suportado', e);
+                    state.soundsEnabled = false;
+                    elements.soundIcon.className = 'fas fa-volume-xmark text-sm';
+                    elements.soundBtn.disabled = true;
+                }
+            }
+
+            // Tocar som
+            function playSound(type) {
+                if (!state.soundsEnabled || !state.audioContext) return;
+                
+                const now = state.audioContext.currentTime;
+                const osc = state.audioContext.createOscillator();
+                const gain = state.audioContext.createGain();
+                
+                switch(type) {
+                    case 'start':
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(440, now);
+                        gain.gain.setValueAtTime(0.3, now);
+                        break;
+                    case 'breath':
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(880, now);
+                        gain.gain.setValueAtTime(0.2, now);
+                        break;
+                    case 'hold':
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(220, now);
+                        gain.gain.setValueAtTime(0.4, now);
+                        break;
+                    case 'recovery':
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(660, now);
+                        gain.gain.setValueAtTime(0.3, now);
+                        break;
+                    case 'end':
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(880, now);
+                        osc.frequency.exponentialRampToValueAtTime(440, now + 0.5);
+                        gain.gain.setValueAtTime(0.3, now);
+                        break;
+                    case 'click':
+                        osc.type = 'square';
+                        osc.frequency.setValueAtTime(220, now);
+                        gain.gain.setValueAtTime(0.1, now);
+                        break;
+                }
+                
+                osc.connect(gain);
+                gain.connect(state.audioContext.destination);
+                
+                osc.start(now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                osc.stop(now + 0.6);
+            }
+
+            // Alternar som
+            function toggleSound() {
+                if (!state.audioContext) return;
+                
+                state.soundsEnabled = !state.soundsEnabled;
+                
+                if (state.soundsEnabled) {
+                    elements.soundIcon.className = 'fas fa-volume-up text-sm';
+                    if (state.audioContext.state === 'suspended') {
+                        state.audioContext.resume();
+                    }
+                    if (state.isRunning && !state.backgroundNoise) {
+                        initAudioContext();
+                        state.backgroundNoise.start();
+                    }
+                    playSound('click');
+                } else {
+                    elements.soundIcon.className = 'fas fa-volume-mute text-sm';
+                    if (state.backgroundNoise) {
+                        state.backgroundNoise.stop();
+                        state.backgroundNoise = null;
+                    }
+                }
+            }
+
+            // Atualizar velocidade
+            function updateSpeed() {
+                const speed = parseInt(elements.speedSlider.value);
+                elements.speedValue.textContent = speed;
+                state.breathDuration = 6000 - (speed - 1) * 555;
+                
+                if (state.isRunning && state.currentPhase === 'breathing' && state.breathInterval) {
+                    clearInterval(state.breathInterval);
+                    startBreathingPhase();
+                }
+                
+                if (state.soundsEnabled) playSound('click');
+            }
+
+            // Selecionar número de respirações
+            function selectBreathCount(count) {
+                state.breathCount = count;
+                elements.counter.textContent = count;
+                
+                elements.breathOptions.forEach(option => {
+                    option.classList.remove('selected');
+                    if (parseInt(option.dataset.breaths) === count) {
+                        option.classList.add('selected');
+                    }
+                });
+                
+                if (state.isRunning && state.currentPhase === 'breathing' && state.breathInterval) {
+                    clearInterval(state.breathInterval);
+                    startBreathingPhase();
+                }
+                
+                if (state.soundsEnabled) playSound('click');
+            }
+
+            // Iniciar sessão
+            function startSession() {
+                if (state.isRunning) {
+                    stopSession();
+                    return;
+                }
+                
+                state.isRunning = true;
+                state.currentCycle = 1;
+                state.currentPhase = 'breathing';
+                state.sessionStartTime = new Date();
+                elements.cycleCount.textContent = state.currentCycle;
+                elements.totalCycles.textContent = state.maxCycles;
+                
+                setSessionActive(true);
+                updateButtonState('breathing');
+                updateProgress(0);
+                
+                if (state.soundsEnabled) {
+                    playSound('start');
+                    if (!state.backgroundNoise) {
+                        initAudioContext();
+                        state.backgroundNoise.start();
+                    }
+                }
+                
+                startBreathingPhase();
+            }
+
+            // Iniciar fase de respiração
+            function startBreathingPhase() {
+                let count = state.breathCount;
+                elements.counter.textContent = count;
+                elements.phaseText.textContent = 'Inspire profundamente';
+                
+                showPhase('breathing');
+                updatePhaseBadge('breathing');
+                animateBreath('in');
+                
+                state.breathInterval = setInterval(() => {
+                    count--;
+                    elements.counter.textContent = count;
+                    updateProgress(((state.breathCount - count) / state.breathCount) * 100);
+                    
+                    if (elements.breathingCircle.classList.contains('breathing-out')) {
+                        animateBreath('in');
+                        elements.phaseText.textContent = 'Inspire profundamente';
+                        
+                        if (count <= state.lastBreathSound && state.soundsEnabled) {
+                            playSound('breath');
+                        }
+                    } else {
+                        animateBreath('out');
+                        elements.phaseText.textContent = 'Libere naturalmente';
+                    }
+                    
+                    if (count <= 0) {
+                        clearInterval(state.breathInterval);
+                        if (state.soundsEnabled) playSound('hold');
+                        startHoldPhase();
+                    }
+                }, state.breathDuration);
+            }
+
+            // Animar respiração
+            function animateBreath(type) {
+                if (type === 'in') {
+                    elements.breathingCircle.classList.remove('breathing-out');
+                    elements.breathingCircle.classList.add('breathing-in');
+                } else {
+                    elements.breathingCircle.classList.remove('breathing-in');
+                    elements.breathingCircle.classList.add('breathing-out');
+                }
+            }
+
+            // Iniciar fase de retenção
+            function startHoldPhase() {
+                state.currentPhase = 'hold';
+                state.holdStartTime = new Date();
+                
+                showPhase('hold');
+                updatePhaseBadge('hold');
+                updateButtonState('hold');
+            }
+
+            // Iniciar fase de recuperação
+            function startRecoveryPhase() {
+                state.currentPhase = 'recovery';
+                state.holdDuration = Math.floor((new Date() - state.holdStartTime) / 1000);
+                
+                addRecord(state.currentCycle, state.holdDuration);
+                
+                showPhase('recovery');
+                updatePhaseBadge('recovery');
+                updateButtonState('recovery');
+                
+                if (state.soundsEnabled) playSound('recovery');
+                
+                let recoveryTime = 15;
+                elements.recoveryCounter.textContent = recoveryTime;
+                
+                state.recoveryInterval = setInterval(() => {
+                    recoveryTime--;
+                    elements.recoveryCounter.textContent = recoveryTime;
+                    
+                    if (recoveryTime <= 0) {
+                        clearInterval(state.recoveryInterval);
+                        
+                        if (state.currentCycle >= state.maxCycles) {
+                            if (state.soundsEnabled) playSound('end');
+                            completeCycle();
+                        } else {
+                            state.currentCycle++;
+                            elements.cycleCount.textContent = state.currentCycle;
+                            startBreathingPhase();
+                            updateButtonState('breathing');
+                        }
+                    }
+                }, 1000);
+            }
+
+            // Completar ciclo
+            function completeCycle() {
+                state.isRunning = false;
+                state.currentPhase = 'idle';
+                
+                resetUI();
+                updateButtonState('idle');
+                updatePhaseBadge('idle');
+                setSessionActive(false);
+                
+                if (state.backgroundNoise) {
+                    state.backgroundNoise.stop();
+                    state.backgroundNoise = null;
+                }
+                
+                addSessionRecord();
+                showSessionSummary();
+                
+                if (state.soundsEnabled) playSound('end');
+            }
+
+            // Parar sessão
+            function stopSession() {
+                state.isRunning = false;
+                state.currentPhase = 'idle';
+                clearInterval(state.breathInterval);
+                clearInterval(state.recoveryInterval);
+                
+                resetUI();
+                updateButtonState('idle');
+                updatePhaseBadge('idle');
+                setSessionActive(false);
+                
+                if (state.backgroundNoise) {
+                    state.backgroundNoise.stop();
+                    state.backgroundNoise = null;
+                }
+                
+                if (state.soundsEnabled) playSound('click');
+            }
+
+            // Mostrar fase específica
+            function showPhase(phase) {
+                elements.breathingCounter.classList.add('opacity-0');
+                elements.holdCounterContainer.classList.add('opacity-0');
+                elements.recoveryCounterContainer.classList.add('opacity-0');
+                
+                switch(phase) {
+                    case 'breathing':
+                        elements.breathingCounter.classList.remove('opacity-0');
+                        elements.breathingCircle.classList.remove('opacity-20');
+                        break;
+                    case 'hold':
+                        elements.holdCounterContainer.classList.remove('opacity-0');
+                        elements.breathingCircle.classList.add('opacity-20');
+                        break;
+                    case 'recovery':
+                        elements.recoveryCounterContainer.classList.remove('opacity-0');
+                        elements.breathingCircle.classList.add('opacity-20');
+                        break;
+                }
+            }
+
+            // Atualizar estado do botão
+            function updateButtonState(stateType) {
+                switch(stateType) {
+                    case 'idle':
+                        elements.startBtn.classList.remove('hidden');
+                        elements.holdBtn.classList.add('hidden');
+                        elements.startBtn.innerHTML = '<i class="fas fa-play mr-2 text-xs"></i><span>Iniciar</span>';
+                        elements.startBtn.className = 'flex-1 h-12 rounded-xl bg-warm-orange text-white text-sm font-semibold btn-transition hover:bg-orange-500 active:bg-vivid-orange flex items-center justify-center shadow-lg shadow-orange-500/20';
+                        break;
+                    case 'breathing':
+                        elements.startBtn.classList.remove('hidden');
+                        elements.holdBtn.classList.add('hidden');
+                        elements.startBtn.innerHTML = '<i class="fas fa-stop mr-2 text-xs"></i><span>Parar</span>';
+                        elements.startBtn.className = 'flex-1 h-12 rounded-xl bg-red-500/80 text-white text-sm font-semibold btn-transition hover:bg-red-500 active:bg-red-600 flex items-center justify-center shadow-lg shadow-red-500/20';
+                        break;
+                    case 'hold':
+                        elements.startBtn.classList.add('hidden');
+                        elements.holdBtn.classList.remove('hidden');
+                        break;
+                    case 'recovery':
+                        elements.startBtn.classList.add('hidden');
+                        elements.holdBtn.classList.add('hidden');
+                        break;
+                }
+            }
+
+            // Adicionar registro
+            function addRecord(cycle, duration) {
+                state.holdRecords.unshift({
+                    cycle: cycle,
+                    duration: duration,
+                    time: new Date()
+                });
+                updateRecordsDisplay();
+            }
+
+            // Adicionar registro de sessão completa
+            function addSessionRecord() {
+                if (state.holdRecords.length > 0) {
+                    const sessionDuration = Math.floor((new Date() - state.holdRecords[state.holdRecords.length - 1].time) / 1000);
+                    const avgHold = Math.round(state.holdRecords.reduce((sum, record) => sum + record.duration, 0) / state.holdRecords.length);
+                    
+                    state.sessionRecords.unshift({
+                        cycles: state.maxCycles,
+                        duration: sessionDuration,
+                        avgHold: avgHold,
+                        time: new Date()
+                    });
+                }
+            }
+
+            // Atualizar exibição de registros
+            function updateRecordsDisplay() {
+                if (state.holdRecords.length > 0) {
+                    elements.recordsList.innerHTML = '';
+                    
+                    state.holdRecords.slice(0, 5).forEach((record, index) => {
+                        const recordItem = document.createElement('div');
+                        recordItem.className = `record-item pl-3 py-2 text-xs flex justify-between items-center rounded-lg slide-in ${index === 0 ? 'bg-sky-900/20 border-l-sky-400' : ''}`;
+                        
+                        const timeStr = record.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        
+                        recordItem.innerHTML = `
+                            <span class="font-medium text-frost-blue/60"><i class="fas fa-lungs text-[0.55rem] mr-1.5 opacity-50"></i>Ciclo ${record.cycle}</span>
+                            <span class="font-bold text-ice-blue">${record.duration}s</span>
+                            <span class="text-frost-blue/30 text-[0.6rem]">${timeStr}</span>
+                        `;
+                        
+                        elements.recordsList.appendChild(recordItem);
+                    });
+                } else {
+                    elements.recordsList.innerHTML = '<div class="text-[0.65rem] text-frost-blue/30 text-center py-4">Nenhum registro ainda</div>';
+                }
+            }
+
+            // Limpar todos os registros
+            function clearAllRecords() {
+                if (state.holdRecords.length === 0 && state.sessionRecords.length === 0) return;
+                
+                state.holdRecords = [];
+                state.sessionRecords = [];
+                updateRecordsDisplay();
+                if (state.soundsEnabled) playSound('click');
+                
+                elements.recordsList.classList.add('vibration');
+                setTimeout(() => {
+                    elements.recordsList.classList.remove('vibration');
+                }, 300);
+            }
+
+            // Show session summary
+            function showSessionSummary() {
+                if (state.holdRecords.length === 0) return;
+                
+                const totalTime = state.sessionStartTime ? Math.floor((new Date() - state.sessionStartTime) / 1000) : 0;
+                const mins = Math.floor(totalTime / 60);
+                const secs = totalTime % 60;
+                
+                elements.summaryTotalTime.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+                
+                const holds = state.holdRecords.map(r => r.duration);
+                const bestHold = Math.max(...holds);
+                const avgHold = Math.round(holds.reduce((a, b) => a + b, 0) / holds.length);
+                
+                elements.summaryBestHold.textContent = `${bestHold}s`;
+                elements.summaryAvgHold.textContent = `${avgHold}s`;
+                elements.summaryCyclesCount.textContent = state.holdRecords.length;
+                
+                elements.summaryDate.textContent = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                
+                // Build cycle list
+                elements.summaryCycles.innerHTML = '';
+                state.holdRecords.forEach((record, i) => {
+                    const cycleEl = document.createElement('div');
+                    cycleEl.className = 'flex justify-between items-center bg-white/[0.03] rounded-lg px-3 py-2';
+                    const isBest = record.duration === bestHold;
+                    cycleEl.innerHTML = `
+                        <span class="text-xs text-frost-blue/60 font-medium">Ciclo ${record.cycle}</span>
+                        <span class="text-sm font-bold ${isBest ? 'text-orange-400' : 'text-ice-blue'}">${record.duration}s${isBest ? ' <i class="fas fa-trophy text-[0.5rem] text-orange-400/60 ml-1"></i>' : ''}</span>
+                    `;
+                    elements.summaryCycles.appendChild(cycleEl);
+                });
+                
+                elements.sessionSummary.classList.add('active');
+            }
+
+            // Hide session summary
+            function hideSessionSummary() {
+                elements.sessionSummary.classList.remove('active');
+            }
+
+            // Save as image
+            function saveSummaryAsImage() {
+                const summaryEl = elements.sessionSummary.querySelector('.frost-glass');
+                if (!summaryEl) return;
+                
+                // Use canvas to draw the summary
+                const canvas = document.createElement('canvas');
+                const scale = 2;
+                const w = 400;
+                const h = 520;
+                canvas.width = w * scale;
+                canvas.height = h * scale;
+                const ctx = canvas.getContext('2d');
+                ctx.scale(scale, scale);
+                
+                // Background
+                ctx.fillStyle = '#0f172a';
+                ctx.beginPath();
+                ctx.roundRect(0, 0, w, h, 16);
+                ctx.fill();
+                
+                // Border
+                ctx.strokeStyle = 'rgba(186, 230, 253, 0.06)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                
+                // Title
+                ctx.fillStyle = '#e0f2fe';
+                ctx.font = 'bold 20px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Sessão Completa', w / 2, 50);
+                
+                // Date
+                ctx.fillStyle = 'rgba(186, 230, 253, 0.5)';
+                ctx.font = '500 10px Inter, sans-serif';
+                ctx.fillText(elements.summaryDate.textContent, w / 2, 70);
+                
+                // Stats boxes
+                const boxY = 90;
+                const boxH = 55;
+                const boxW = (w - 40 - 12) / 2;
+                
+                // Total time box
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+                ctx.beginPath();
+                ctx.roundRect(20, boxY, boxW, boxH, 8);
+                ctx.fill();
+                ctx.fillStyle = 'rgba(186, 230, 253, 0.4)';
+                ctx.font = '600 9px Inter, sans-serif';
+                ctx.fillText('TEMPO TOTAL', 20 + boxW / 2, boxY + 20);
+                ctx.fillStyle = '#e0f2fe';
+                ctx.font = 'bold 18px Inter, sans-serif';
+                ctx.fillText(elements.summaryTotalTime.textContent, 20 + boxW / 2, boxY + 42);
+                
+                // Best hold box
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+                ctx.beginPath();
+                ctx.roundRect(20 + boxW + 12, boxY, boxW, boxH, 8);
+                ctx.fill();
+                ctx.fillStyle = 'rgba(186, 230, 253, 0.4)';
+                ctx.font = '600 9px Inter, sans-serif';
+                ctx.fillText('MELHOR RETENÇÃO', 20 + boxW + 12 + boxW / 2, boxY + 20);
+                ctx.fillStyle = '#fb923c';
+                ctx.font = 'bold 18px Inter, sans-serif';
+                ctx.fillText(elements.summaryBestHold.textContent, 20 + boxW + 12 + boxW / 2, boxY + 42);
+                
+                // Cycles
+                let cycleY = 165;
+                state.holdRecords.forEach((record) => {
+                    const isBest = record.duration === Math.max(...state.holdRecords.map(r => r.duration));
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+                    ctx.beginPath();
+                    ctx.roundRect(20, cycleY, w - 40, 32, 8);
+                    ctx.fill();
+                    
+                    ctx.textAlign = 'left';
+                    ctx.fillStyle = 'rgba(186, 230, 253, 0.6)';
+                    ctx.font = '500 11px Inter, sans-serif';
+                    ctx.fillText(`Ciclo ${record.cycle}`, 35, cycleY + 20);
+                    
+                    ctx.textAlign = 'right';
+                    ctx.fillStyle = isBest ? '#fb923c' : '#e0f2fe';
+                    ctx.font = 'bold 13px Inter, sans-serif';
+                    ctx.fillText(`${record.duration}s`, w - 35, cycleY + 20);
+                    
+                    cycleY += 40;
+                });
+                
+                // Bottom stats
+                cycleY += 10;
+                const bottomBoxW = (w - 40 - 12) / 2;
+                
+                ctx.textAlign = 'center';
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+                ctx.beginPath();
+                ctx.roundRect(20, cycleY, bottomBoxW, boxH, 8);
+                ctx.fill();
+                ctx.fillStyle = 'rgba(186, 230, 253, 0.4)';
+                ctx.font = '600 9px Inter, sans-serif';
+                ctx.fillText('MÉDIA', 20 + bottomBoxW / 2, cycleY + 20);
+                ctx.fillStyle = '#2dd4bf';
+                ctx.font = 'bold 18px Inter, sans-serif';
+                ctx.fillText(elements.summaryAvgHold.textContent, 20 + bottomBoxW / 2, cycleY + 42);
+                
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+                ctx.beginPath();
+                ctx.roundRect(20 + bottomBoxW + 12, cycleY, bottomBoxW, boxH, 8);
+                ctx.fill();
+                ctx.fillStyle = 'rgba(186, 230, 253, 0.4)';
+                ctx.font = '600 9px Inter, sans-serif';
+                ctx.fillText('CICLOS', 20 + bottomBoxW + 12 + bottomBoxW / 2, cycleY + 20);
+                ctx.fillStyle = '#e0f2fe';
+                ctx.font = 'bold 18px Inter, sans-serif';
+                ctx.fillText(elements.summaryCyclesCount.textContent, 20 + bottomBoxW + 12 + bottomBoxW / 2, cycleY + 42);
+                
+                // Hofwin branding
+                ctx.textAlign = 'center';
+                ctx.fillStyle = 'rgba(186, 230, 253, 0.2)';
+                ctx.font = '600 9px Inter, sans-serif';
+                ctx.fillText('Hofwin — Respiração Wim Hof', w / 2, h - 16);
+                
+                // Download
+                const now = new Date();
+                const filename = `hofwin-${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}-${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}.png`;
+                
+                const link = document.createElement('a');
+                link.download = filename;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                if (state.soundsEnabled) playSound('click');
+            }
+
+            // Resetar UI
+            function resetUI() {
+                elements.breathingCounter.classList.remove('opacity-0');
+                elements.holdCounterContainer.classList.add('opacity-0');
+                elements.recoveryCounterContainer.classList.add('opacity-0');
+                elements.breathingCircle.classList.add('opacity-20');
+                
+                elements.counter.textContent = state.breathCount;
+                elements.recoveryCounter.textContent = '15';
+                elements.phaseText.textContent = 'Pronto para começar';
+                updateProgress(0);
+            }
+
+            // Atualizar progresso
+            function updateProgress(percent) {
+                elements.breathProgress.style.width = `${percent}%`;
+            }
+
+            // Event Listeners
+            elements.startBtn.addEventListener('click', startSession);
+            elements.holdBtn.addEventListener('click', function() {
+                if (state.currentPhase === 'hold') {
+                    startRecoveryPhase();
+                }
+            });
+            elements.soundBtn.addEventListener('click', toggleSound);
+            elements.speedSlider.addEventListener('input', updateSpeed);
+            elements.clearAllBtn.addEventListener('click', clearAllRecords);
+
+            elements.breathOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    selectBreathCount(parseInt(this.dataset.breaths));
+                });
+            });
+
+            // Summary buttons
+            elements.saveImageBtn.addEventListener('click', saveSummaryAsImage);
+            elements.newSessionBtn.addEventListener('click', function() {
+                hideSessionSummary();
+                state.holdRecords = [];
+                updateRecordsDisplay();
+            });
+
+            // Records toggle
+            elements.recordsToggle.addEventListener('click', function(e) {
+                if (e.target.id === 'clearAllBtn') return;
+                elements.recordsContent.parentElement.classList.toggle('records-collapsed');
+                const icon = elements.recordsToggle.querySelector('.toggle-icon');
+                if (elements.recordsContent.parentElement.classList.contains('records-collapsed')) {
+                    icon.style.transform = 'rotate(-90deg)';
+                } else {
+                    icon.style.transform = 'rotate(0deg)';
+                }
+            });
+
+            // Hover sound on buttons
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.addEventListener('mousedown', () => {
+                    if (state.soundsEnabled) playSound('click');
+                });
+            });
+
+            // Inicialização
+            initAudioContext();
+        });
+    </script>
+</body>
+</html>
