@@ -408,6 +408,91 @@
             transform: scale(1.15);
             box-shadow: 0 0 10px rgba(186, 230, 253, 0.3);
         }
+
+        /* Guided cycles overlay */
+        .guided-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 40;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .guided-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .guided-panel {
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+        .guided-overlay.active .guided-panel {
+            transform: translateY(0);
+        }
+        .guided-cycle-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .guided-cycle-row:last-child { border-bottom: none; }
+        .guided-input {
+            width: 48px;
+            height: 36px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: var(--color-ice-blue);
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .guided-input:focus {
+            border-color: rgba(56, 189, 248, 0.4);
+            background: rgba(255,255,255,0.08);
+        }
+        .guided-input::placeholder { color: rgba(186, 230, 253, 0.25); }
+        .guided-preset {
+            padding: 6px 12px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: rgba(186, 230, 253, 0.6);
+            font-size: 0.65rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .guided-preset:hover {
+            background: rgba(255,255,255,0.08);
+            color: rgba(186, 230, 253, 0.9);
+        }
+        .guided-preset.active {
+            background: rgba(3, 105, 161, 0.25);
+            border-color: rgba(56, 189, 248, 0.3);
+            color: var(--color-ice-blue);
+        }
+        .guided-active-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--color-recovery-teal);
+            box-shadow: 0 0 6px rgba(45, 212, 191, 0.5);
+        }
     </style>
 </head>
 <body>
@@ -469,7 +554,7 @@
                 <i class="fas fa-check mr-2 text-xs"></i><span>Continuar</span>
             </button>
 
-            <!-- Sound & Ambient Buttons -->
+            <!-- Sound, Ambient & Guided Buttons -->
             <div class="flex gap-3">
                 <button id="soundBtn" class="flex-1 h-11 rounded-xl bg-white/5 text-frost-blue/70 btn-transition hover:bg-white/10 active:bg-white/15 flex items-center justify-center gap-2">
                     <i class="fas fa-volume-up text-sm" id="soundIcon"></i>
@@ -478,6 +563,11 @@
                 <button id="ambientBtn" class="flex-1 h-11 rounded-xl bg-white/5 text-frost-blue/70 btn-transition hover:bg-white/10 active:bg-white/15 flex items-center justify-center gap-2">
                     <i class="fas fa-music text-sm" id="ambientIcon"></i>
                     <span class="text-xs">Ambiente</span>
+                </button>
+                <button id="guidedBtn" class="flex-1 h-11 rounded-xl bg-white/5 text-frost-blue/70 btn-transition hover:bg-white/10 active:bg-white/15 flex items-center justify-center gap-2 relative">
+                    <i class="fas fa-stopwatch text-sm"></i>
+                    <span class="text-xs">Guiado</span>
+                    <div id="guidedBadge" class="guided-active-badge hidden"></div>
                 </button>
             </div>
 
@@ -573,6 +663,43 @@
         </div>
     </div>
 
+    <!-- Guided Cycles Overlay -->
+    <div id="guidedOverlay" class="guided-overlay">
+        <div class="guided-panel w-full max-w-[480px] frost-glass rounded-t-2xl p-5 pb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-semibold text-gradient">Ciclos Definidos</h3>
+                <button id="guidedCloseBtn" class="w-8 h-8 rounded-full bg-white/5 text-frost-blue/50 flex items-center justify-center btn-transition hover:bg-white/10 hover:text-frost-blue/80">
+                    <i class="fas fa-xmark text-sm"></i>
+                </button>
+            </div>
+
+            <p class="text-[0.65rem] text-frost-blue/40 mb-4 leading-relaxed">Defina tempos de retenção por ciclo. A retenção encerra automaticamente ao atingir o tempo — ou pressione Continuar para encerrar antes.</p>
+
+            <!-- Presets -->
+            <div class="mb-4">
+                <span class="text-[0.6rem] text-frost-blue/40 uppercase tracking-wider font-medium block mb-2">Presets</span>
+                <div class="flex gap-2 flex-wrap" id="guidedPresets">
+                    <button class="guided-preset" data-preset="60,90,120">1m / 1m30 / 2m</button>
+                    <button class="guided-preset" data-preset="60,60,60">1m cada</button>
+                    <button class="guided-preset" data-preset="90,120,150">1m30 / 2m / 2m30</button>
+                    <button class="guided-preset" data-preset="120,150,180">2m / 2m30 / 3m</button>
+                </div>
+            </div>
+
+            <!-- Per-cycle inputs -->
+            <div class="mb-5">
+                <span class="text-[0.6rem] text-frost-blue/40 uppercase tracking-wider font-medium block mb-2">Tempos por ciclo</span>
+                <div id="guidedCycleInputs"></div>
+            </div>
+
+            <!-- Enable toggle -->
+            <button id="guidedToggleBtn" class="w-full h-11 rounded-xl bg-white/5 text-frost-blue/70 text-sm font-medium btn-transition hover:bg-white/10 flex items-center justify-center gap-2">
+                <i class="fas fa-stopwatch text-xs"></i>
+                <span id="guidedToggleText">Ativar Modo Guiado</span>
+            </button>
+        </div>
+    </div>
+
     <!-- Session Summary Overlay -->
     <div id="sessionSummary" class="session-summary">
         <div class="w-full max-w-sm mx-4 frost-glass rounded-2xl p-6 sm:p-8">
@@ -665,7 +792,15 @@
                 ambientCloseBtn: document.getElementById('ambientCloseBtn'),
                 ambientVolumeSlider: document.getElementById('ambientVolumeSlider'),
                 ambientVolValue: document.getElementById('ambientVolValue'),
-                ambientSoundItems: document.querySelectorAll('.ambient-sound-item')
+                ambientSoundItems: document.querySelectorAll('.ambient-sound-item'),
+                guidedOverlay: document.getElementById('guidedOverlay'),
+                guidedCloseBtn: document.getElementById('guidedCloseBtn'),
+                guidedCycleInputs: document.getElementById('guidedCycleInputs'),
+                guidedPresets: document.getElementById('guidedPresets'),
+                guidedToggleBtn: document.getElementById('guidedToggleBtn'),
+                guidedToggleText: document.getElementById('guidedToggleText'),
+                guidedBtn: document.getElementById('guidedBtn'),
+                guidedBadge: document.getElementById('guidedBadge')
             };
 
             // Estados do aplicativo
@@ -689,7 +824,11 @@
                 sessionStartTime: null,
                 ambientSound: null,
                 ambientInstance: null,
-                ambientVolume: 0.5
+                ambientVolume: 0.5,
+                guidedMode: false,
+                definedHoldTimes: [],
+                holdTimerInterval: null,
+                holdTimeRemaining: 0
             };
 
             // Phase badge update
@@ -1035,6 +1174,42 @@
                 showPhase('hold');
                 updatePhaseBadge('hold');
                 updateButtonState('hold');
+
+                var targetTime = 0;
+                if (state.guidedMode && state.definedHoldTimes[state.currentCycle - 1] > 0) {
+                    targetTime = state.definedHoldTimes[state.currentCycle - 1];
+                    state.holdTimeRemaining = targetTime;
+
+                    elements.holdCounter.textContent = formatCountdown(targetTime);
+                    elements.holdCounterContainer.querySelector('.text-xs').textContent = 'Meta: ' + formatDuration(targetTime);
+
+                    var elapsedAtLastTick = 0;
+
+                    state.holdTimerInterval = setInterval(function() {
+                        var elapsed = Math.floor((new Date() - state.holdStartTime) / 1000);
+                        state.holdTimeRemaining = Math.max(0, targetTime - elapsed);
+
+                        elements.holdCounter.textContent = formatCountdown(state.holdTimeRemaining);
+
+                        // Tick a cada 30s
+                        if (elapsed > 0 && elapsed % 30 === 0 && elapsed !== elapsedAtLastTick) {
+                            elapsedAtLastTick = elapsed;
+                            if (state.soundsEnabled) playSound('countdown-tick');
+                        }
+
+                        // Countdown urgente nos últimos 3s
+                        if (state.holdTimeRemaining <= 3 && state.holdTimeRemaining > 0) {
+                            if (state.soundsEnabled) playSound('countdown-tick');
+                        }
+
+                        if (state.holdTimeRemaining <= 0) {
+                            clearInterval(state.holdTimerInterval);
+                            state.holdTimerInterval = null;
+                            if (state.soundsEnabled) playSound('countdown-final');
+                            startRecoveryPhase();
+                        }
+                    }, 1000);
+                }
             }
 
             // Iniciar fase de recuperação
@@ -1108,6 +1283,10 @@
                 state.currentPhase = 'idle';
                 clearInterval(state.breathInterval);
                 clearInterval(state.recoveryInterval);
+                if (state.holdTimerInterval) {
+                    clearInterval(state.holdTimerInterval);
+                    state.holdTimerInterval = null;
+                }
                 
                 resetUI();
                 updateButtonState('idle');
@@ -1172,11 +1351,15 @@
 
             // Adicionar registro
             function addRecord(cycle, duration) {
-                state.holdRecords.unshift({
+                var record = {
                     cycle: cycle,
                     duration: duration,
                     time: new Date()
-                });
+                };
+                if (state.guidedMode && state.definedHoldTimes[cycle - 1] > 0) {
+                    record.target = state.definedHoldTimes[cycle - 1];
+                }
+                state.holdRecords.unshift(record);
                 updateRecordsDisplay();
             }
 
@@ -1208,7 +1391,7 @@
                         
                         recordItem.innerHTML = `
                             <span class="font-medium text-frost-blue/60"><i class="fas fa-lungs text-[0.55rem] mr-1.5 opacity-50"></i>Ciclo ${record.cycle}</span>
-                            <span class="font-bold text-ice-blue">${record.duration}s</span>
+                            <span class="font-bold text-ice-blue">${formatDuration(record.duration)}</span>
                             <span class="text-frost-blue/30 text-[0.6rem]">${timeStr}</span>
                         `;
                         
@@ -1248,8 +1431,8 @@
                 const bestHold = Math.max(...holds);
                 const avgHold = Math.round(holds.reduce((a, b) => a + b, 0) / holds.length);
                 
-                elements.summaryBestHold.textContent = `${bestHold}s`;
-                elements.summaryAvgHold.textContent = `${avgHold}s`;
+                elements.summaryBestHold.textContent = formatDuration(bestHold);
+                elements.summaryAvgHold.textContent = formatDuration(avgHold);
                 elements.summaryCyclesCount.textContent = state.holdRecords.length;
                 
                 elements.summaryDate.textContent = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -1260,9 +1443,18 @@
                     const cycleEl = document.createElement('div');
                     cycleEl.className = 'flex justify-between items-center bg-white/[0.03] rounded-lg px-3 py-2';
                     const isBest = record.duration === bestHold;
+                    var durationDisplay = formatDuration(record.duration);
+                    if (record.target) {
+                        var metTarget = record.duration >= record.target;
+                        var targetTag = metTarget
+                            ? '<span class="text-[0.5rem] text-teal-400/60 ml-1"><i class="fas fa-check"></i></span>'
+                            : '<span class="text-[0.5rem] text-frost-blue/30 ml-1">/ ' + formatDuration(record.target) + '</span>';
+                        durationDisplay += targetTag;
+                    }
+                    if (isBest) durationDisplay += ' <i class="fas fa-trophy text-[0.5rem] text-orange-400/60 ml-1"></i>';
                     cycleEl.innerHTML = `
                         <span class="text-xs text-frost-blue/60 font-medium">Ciclo ${record.cycle}</span>
-                        <span class="text-sm font-bold ${isBest ? 'text-orange-400' : 'text-ice-blue'}">${record.duration}s${isBest ? ' <i class="fas fa-trophy text-[0.5rem] text-orange-400/60 ml-1"></i>' : ''}</span>
+                        <span class="text-sm font-bold ${isBest ? 'text-orange-400' : 'text-ice-blue'}">${durationDisplay}</span>
                     `;
                     elements.summaryCycles.appendChild(cycleEl);
                 });
@@ -1358,7 +1550,11 @@
                     ctx.textAlign = 'right';
                     ctx.fillStyle = isBest ? '#fb923c' : '#e0f2fe';
                     ctx.font = 'bold 13px Inter, sans-serif';
-                    ctx.fillText(`${record.duration}s`, w - 35, cycleY + 20);
+                    var canvasDur = formatDuration(record.duration);
+                    if (record.target) {
+                        canvasDur += record.duration >= record.target ? ' ✓' : '/' + formatDuration(record.target);
+                    }
+                    ctx.fillText(canvasDur, w - 35, cycleY + 20);
                     
                     cycleY += 40;
                 });
@@ -1408,6 +1604,21 @@
                 if (state.soundsEnabled) playSound('click');
             }
 
+            // Formatar duração em segundos para exibição
+            function formatDuration(secs) {
+                if (secs < 60) return secs + 's';
+                var m = Math.floor(secs / 60);
+                var s = secs % 60;
+                return s > 0 ? m + 'm ' + s + 's' : m + 'm';
+            }
+
+            // Formatar duração para countdown (MM:SS)
+            function formatCountdown(secs) {
+                var m = Math.floor(secs / 60);
+                var s = secs % 60;
+                return String(m) + ':' + String(s).padStart(2, '0');
+            }
+
             // Resetar UI
             function resetUI() {
                 elements.breathingCounter.classList.remove('opacity-0');
@@ -1416,6 +1627,8 @@
                 elements.breathingCircle.classList.add('opacity-20');
                 
                 elements.counter.textContent = state.breathCount;
+                elements.holdCounter.textContent = 'Segure';
+                elements.holdCounterContainer.querySelector('.text-xs').textContent = 'Pressione Continuar';
                 elements.recoveryCounter.textContent = '15';
                 elements.phaseText.textContent = 'Pronto para começar';
                 updateProgress(0);
@@ -1513,10 +1726,103 @@
                 }
             }
 
+            // === GUIDED CYCLES MODE ===
+
+            function buildGuidedCycleInputs() {
+                var container = elements.guidedCycleInputs;
+                container.innerHTML = '';
+                var cycles = state.maxCycles;
+                for (var i = 0; i < cycles; i++) {
+                    var existingTime = state.definedHoldTimes[i] || 0;
+                    var mins = Math.floor(existingTime / 60);
+                    var secs = existingTime % 60;
+                    var row = document.createElement('div');
+                    row.className = 'guided-cycle-row';
+                    row.innerHTML =
+                        '<span class="text-[0.7rem] text-frost-blue/50 font-medium w-16 flex-shrink-0">Ciclo ' + (i + 1) + '</span>' +
+                        '<input type="number" class="guided-input" min="0" max="10" value="' + mins + '" data-cycle="' + i + '" data-field="min" placeholder="min">' +
+                        '<span class="text-[0.65rem] text-frost-blue/30">m</span>' +
+                        '<input type="number" class="guided-input" min="0" max="59" value="' + secs + '" data-cycle="' + i + '" data-field="sec" placeholder="seg">' +
+                        '<span class="text-[0.65rem] text-frost-blue/30">s</span>' +
+                        '<span class="text-[0.6rem] text-frost-blue/30 ml-auto flex-shrink-0 guided-total" data-cycle-total="' + i + '">' + formatDuration(existingTime) + '</span>';
+                    container.appendChild(row);
+                }
+
+                container.querySelectorAll('.guided-input').forEach(function(input) {
+                    input.addEventListener('input', function() {
+                        var cycleIdx = parseInt(this.dataset.cycle);
+                        var minInput = container.querySelector('input[data-cycle="' + cycleIdx + '"][data-field="min"]');
+                        var secInput = container.querySelector('input[data-cycle="' + cycleIdx + '"][data-field="sec"]');
+                        var m = parseInt(minInput.value) || 0;
+                        var s = parseInt(secInput.value) || 0;
+                        state.definedHoldTimes[cycleIdx] = m * 60 + s;
+                        container.querySelector('[data-cycle-total="' + cycleIdx + '"]').textContent = formatDuration(m * 60 + s);
+                        clearPresetSelection();
+                    });
+                });
+            }
+
+            function clearPresetSelection() {
+                elements.guidedPresets.querySelectorAll('.guided-preset').forEach(function(btn) {
+                    btn.classList.remove('active');
+                });
+            }
+
+            function applyPreset(times) {
+                state.definedHoldTimes = times.slice();
+                buildGuidedCycleInputs();
+                elements.guidedPresets.querySelectorAll('.guided-preset').forEach(function(btn) {
+                    var btnTimes = btn.dataset.preset.split(',').map(Number);
+                    btn.classList.toggle('active', JSON.stringify(btnTimes) === JSON.stringify(times));
+                });
+            }
+
+            function toggleGuidedOverlay() {
+                var overlay = elements.guidedOverlay;
+                if (overlay.classList.contains('active')) {
+                    overlay.classList.remove('active');
+                } else {
+                    buildGuidedCycleInputs();
+                    overlay.classList.add('active');
+                }
+            }
+
+            function toggleGuidedMode() {
+                var allZero = state.definedHoldTimes.every(function(t) { return t <= 0; });
+                if (allZero) return;
+
+                state.guidedMode = !state.guidedMode;
+                updateGuidedButton();
+                elements.guidedOverlay.classList.remove('active');
+                if (state.soundsEnabled) playSound('click');
+            }
+
+            function updateGuidedButton() {
+                if (state.guidedMode) {
+                    elements.guidedBtn.classList.add('bg-white/10');
+                    elements.guidedBtn.classList.remove('bg-white/5');
+                    elements.guidedBadge.classList.remove('hidden');
+                    elements.guidedToggleText.textContent = 'Desativar Modo Guiado';
+                    elements.guidedToggleBtn.classList.add('bg-teal-500/20');
+                    elements.guidedToggleBtn.classList.remove('bg-white/5');
+                } else {
+                    elements.guidedBtn.classList.remove('bg-white/10');
+                    elements.guidedBtn.classList.add('bg-white/5');
+                    elements.guidedBadge.classList.add('hidden');
+                    elements.guidedToggleText.textContent = 'Ativar Modo Guiado';
+                    elements.guidedToggleBtn.classList.remove('bg-teal-500/20');
+                    elements.guidedToggleBtn.classList.add('bg-white/5');
+                }
+            }
+
             // Event Listeners
             elements.startBtn.addEventListener('click', startSession);
             elements.holdBtn.addEventListener('click', function() {
                 if (state.currentPhase === 'hold') {
+                    if (state.holdTimerInterval) {
+                        clearInterval(state.holdTimerInterval);
+                        state.holdTimerInterval = null;
+                    }
                     startRecoveryPhase();
                 }
             });
@@ -1535,6 +1841,19 @@
                 });
             });
             elements.ambientVolumeSlider.addEventListener('input', updateAmbientVolume);
+
+            elements.guidedBtn.addEventListener('click', toggleGuidedOverlay);
+            elements.guidedCloseBtn.addEventListener('click', toggleGuidedOverlay);
+            elements.guidedOverlay.addEventListener('click', function(e) {
+                if (e.target === elements.guidedOverlay) toggleGuidedOverlay();
+            });
+            elements.guidedToggleBtn.addEventListener('click', toggleGuidedMode);
+            elements.guidedPresets.querySelectorAll('.guided-preset').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var times = this.dataset.preset.split(',').map(Number);
+                    applyPreset(times);
+                });
+            });
 
             elements.breathOptions.forEach(option => {
                 option.addEventListener('click', function() {
