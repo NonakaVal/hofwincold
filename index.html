@@ -1642,8 +1642,8 @@
             // === AMBIENT SOUND ENGINE ===
 
             var ambientSounds = {
-                waves: 'Assets/_audios_mp3/Relax ⧸ som ambiente praia e ondas do mar [S0GO4cVAkiY].mp3',
-                rain: 'Assets/_audios_mp3/Som de Chuva 🌧️ - Para Relaxar e Dormir [Ma5GpR1T2t4].mp3'
+                waves: 'Assets/_audios_mp3/waves.mp3',
+                rain: 'Assets/_audios_mp3/rain.mp3'
             };
 
             function startAmbientSound(soundId) {
@@ -1658,10 +1658,27 @@
                     return;
                 }
                 state.ambientSound = soundId;
-                var audio = new Audio(ambientSounds[soundId]);
+                var audio = new Audio();
+                audio.preload = 'auto';
                 audio.loop = true;
                 audio.volume = state.ambientVolume;
-                audio.play().catch(function() {});
+                audio.src = ambientSounds[soundId];
+
+                audio.addEventListener('error', function() {
+                    state.ambientSound = null;
+                    state.ambientInstance = null;
+                    updateAmbientBtn();
+                    updateAmbientSelection();
+                });
+
+                audio.play().catch(function(err) {
+                    if (err.name !== 'AbortError') {
+                        state.ambientSound = null;
+                        state.ambientInstance = null;
+                        updateAmbientBtn();
+                        updateAmbientSelection();
+                    }
+                });
                 state.ambientInstance = audio;
                 updateAmbientBtn();
             }
